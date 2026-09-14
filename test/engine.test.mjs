@@ -195,7 +195,7 @@ test('Gutenberg next-page metadata ends scrolling while the last page still cont
  test('LibGen resolves actual edition or file covers, and treats missing covers as optional', async () => {
   const { runCover } = await import('../engine.mjs');
   const source = await readSource('libgen');
-  for (const path of ['/editioncovers/137868000/137868366.jpg', '/covers/4544000/abc.jpg']) {
+  for (const path of ['/editioncovers/137868000/137868366.jpg', '/covers/4544000/abc.jpg', '/fictioncovers/3536000/65f38bdbd027b70350dbd1390e8b64d9.jpg']) {
     const host = fixtureHost([{ body: `<img src="/img/logo.png"><img class="img-fluid" src="${path}">` }]);
     const cover = await runCover(source, { editionID: '137868366' }, host);
     assert.equal(cover.url, `https://libgen.li${path}`);

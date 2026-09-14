@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -246,7 +246,7 @@
         "name": "coverPath",
         "ops": [
           {
-            "regex": "<img\\b[^>]*\\bsrc=[\\\"\\x27](/(?:editioncovers|covers)/[^\\\"\\x27]+)",
+            "regex": "<img\\b[^>]*\\bsrc=[\\\"\\x27](/[a-z]*covers/[^\\\"\\x27]+)",
             "flags": "i",
             "group": 1
           }
@@ -260,7 +260,7 @@
             "template": "https://libgen.li{coverPath}"
           },
           {
-            "regex": "^https://libgen\\.li/(?:editioncovers|covers)/.+",
+            "regex": "^https://libgen\\.li/[a-z]*covers/.+",
             "group": 0
           }
         ]
