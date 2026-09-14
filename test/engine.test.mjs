@@ -204,3 +204,15 @@ test('Gutenberg next-page metadata ends scrolling while the last page still cont
   }
   assert.equal(await runCover(source, { editionID: '1' }, fixtureHost([{ body: '<img src="/img/logo.png">' }])), null);
 });
+
+
+test('LibGen stops at the actual last page instead of showing a retry error after short results', async () => {
+  const source = await readSource('libgen');
+  const body = await readFile(new URL('./fixtures/libgen-search.html', import.meta.url), 'utf8');
+  for (const [page, total, expected] of [[1, null, false], [1, 80, true], [79, 80, true], [80, 80, false]]) {
+    const paginator = total === null ? '' : `<script>new Paginator("paginator_example_top", ${total}, 25, ${page}, "/index.php?page=");</script>`;
+    const result = await searchPage(source, 'query', page, fixtureHost([{ body: body + paginator }]));
+    assert.ok(result.items.length > 0);
+    assert.equal(result.hasMore, expected, `page ${page}, total ${total}`);
+  }
+});

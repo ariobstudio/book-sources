@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -30,6 +30,20 @@
             "regex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"'][^>]*>([\\s\\S]*?)</table>",
             "flags": "i",
             "group": 1
+          }
+        ]
+      },
+      {
+        "step": "set",
+        "name": "pageCount",
+        "from": "response.body",
+        "ops": [
+          {
+            "regex": "new\\s+Paginator\\(\\s*[\"\\x27][^\"\\x27]+[\"\\x27]\\s*,\\s*(\\d+)",
+            "group": 1
+          },
+          {
+            "default": "1"
           }
         ]
       }
@@ -182,7 +196,8 @@
         "title"
       ],
       "limit": 50
-    }
+    },
+    "pageCount": "{pageCount}"
   },
   "resolve": {
     "steps": [

@@ -27,6 +27,7 @@ export interface SourceDefinition {
   search?: {
     steps?: Step[];
     nextPagePath?: JSONPath;
+    pageCount?: string;
     items: {
       jsonPath?: JSONPath;
       regex?: string;

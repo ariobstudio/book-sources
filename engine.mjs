@@ -233,10 +233,14 @@ export async function runSearch(source, query, page, host) {
   await runSteps(source.search.steps, vars, host);
   const items = collectResults(source.search.items, vars);
   // A provider's explicit continuation wins over visible/filtered result counts.
-  // HTML catalogs without a continuation field terminate at an empty page.
+  // HTML catalogs can expose a page count through pipeline variables.
   const path = source.search.nextPagePath;
-  const hasMore = path === undefined ? items.length > 0
-    : Boolean(jsonGet(JSON.parse(vars.__res.body), path));
+  const count = source.search.pageCount;
+  const hasMore = path !== undefined
+    ? Boolean(jsonGet(JSON.parse(vars.__res.body), path))
+    : count !== undefined
+      ? pageNumber < Number(interpolate(count, vars))
+      : items.length > 0;
   return { items, hasMore };
 }
 

@@ -107,6 +107,10 @@ function search(value, path) {
   object(value, path);
   steps(value.steps, `${path}.steps`);
   if (value.nextPagePath !== undefined) jsonPath(value.nextPagePath, `${path}.nextPagePath`);
+  if (value.pageCount !== undefined) {
+    string(value.pageCount, `${path}.pageCount`, true);
+    check(value.nextPagePath === undefined, path, 'choose one continuation field');
+  }
   const items = value.items;
   object(items, `${path}.items`);
   check((items.jsonPath != null) !== (items.regex !== undefined), `${path}.items`, 'choose exactly one of jsonPath or regex');

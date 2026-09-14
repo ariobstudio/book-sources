@@ -255,6 +255,10 @@ vocabulary when a provider cannot be represented by the existing operations.
 `runSearch` returns `{ items, hasMore }`. For JSON catalogs, set
 `search.nextPagePath` to the JSON path of the next-page URL (for example `next`).
 A null or empty next-page value ends scrolling even when the last page contains
-books. Without this field, the engine continues until a parsed page is empty.
+books. HTML catalogs may instead set `search.pageCount` to a template such as
+`"{pageCount}"`, using a `set` step to extract the total number of pages. The
+engine continues while the requested page is below that total; invalid or
+missing counts stop continuation. The two continuation fields are mutually
+exclusive. Without either field, the engine continues until a parsed page is empty.
 Apply application format filters after interpreting `hasMore`; a page containing
 only unsupported formats must not prevent the next page from loading.
