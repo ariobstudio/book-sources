@@ -106,6 +106,7 @@ function steps(value, path) {
 function search(value, path) {
   object(value, path);
   steps(value.steps, `${path}.steps`);
+  if (value.nextPagePath !== undefined) jsonPath(value.nextPagePath, `${path}.nextPagePath`);
   const items = value.items;
   object(items, `${path}.items`);
   check((items.jsonPath != null) !== (items.regex !== undefined), `${path}.items`, 'choose exactly one of jsonPath or regex');

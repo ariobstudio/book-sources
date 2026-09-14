@@ -249,3 +249,12 @@ correctness, restrict provider destinations, limit response size, or bound regex
 execution time. Review patterns against representative responses and let the
 embedding host enforce network and resource policies. Extend the documented
 vocabulary when a provider cannot be represented by the existing operations.
+
+### Search continuation
+
+`runSearch` returns `{ items, hasMore }`. For JSON catalogs, set
+`search.nextPagePath` to the JSON path of the next-page URL (for example `next`).
+A null or empty next-page value ends scrolling even when the last page contains
+books. Without this field, the engine continues until a parsed page is empty.
+Apply application format filters after interpreting `hasMore`; a page containing
+only unsupported formats must not prevent the next page from loading.

@@ -1,12 +1,12 @@
 {
   "id": "book-sources",
   "name": "Book Sources",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "sources": [
     {
       "id": "libgen",
       "name": "LibGen",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "description": "Search libgen.li and download EPUB/PDF/MOBI files",
       "contentType": "books",
       "sourceUrl": "sources/libgen.source.json"
@@ -14,7 +14,7 @@
     {
       "id": "gutenberg",
       "name": "Project Gutenberg",
-      "version": "0.3.1",
+      "version": "0.4.0",
       "description": "Search Project Gutenberg ebook metadata through Gutendex.",
       "contentType": "books",
       "sourceUrl": "sources/gutenberg.source.json"

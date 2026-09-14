@@ -25,7 +25,7 @@ build an installable archive from this checkout.
    `/path/to/book-sources` with the absolute path to this checkout.
 
    ```bash
-   npm install /path/to/book-sources/book-sources-0.2.1.tgz
+   npm install /path/to/book-sources/book-sources-0.3.0.tgz
    ```
 
 3. Verify that the installed CLI runs.

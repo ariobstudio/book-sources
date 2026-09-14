@@ -221,7 +221,7 @@ function collectResults(definition, vars) {
  * @param {string} query Search text; templates decide how to encode it.
  * @param {number} page Page number; zero or nonnumeric input defaults to 1.
  * @param {SourceHost} host
- * @returns {Promise<Object[]>} Extracted items, with non-null IDs converted to strings.
+ * @returns {Promise<{items: Object[], hasMore: boolean}>} Items and provider continuation state.
  */
 export async function runSearch(source, query, page, host) {
   const pageNumber = Number(page) || 1;
@@ -231,7 +231,13 @@ export async function runSearch(source, query, page, host) {
     page: pageNumber,
   };
   await runSteps(source.search.steps, vars, host);
-  return collectResults(source.search.items, vars);
+  const items = collectResults(source.search.items, vars);
+  // A provider's explicit continuation wins over visible/filtered result counts.
+  // HTML catalogs without a continuation field terminate at an empty page.
+  const path = source.search.nextPagePath;
+  const hasMore = path === undefined ? items.length > 0
+    : Boolean(jsonGet(JSON.parse(vars.__res.body), path));
+  return { items, hasMore };
 }
 
 /**

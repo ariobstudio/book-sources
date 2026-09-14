@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { interpolate, runSearch, runResolve } from '../engine.mjs';
+import { interpolate, runSearch as searchPage, runResolve } from '../engine.mjs';
 
+const runSearch = async (...args) => (await searchPage(...args)).items;
 const readSource = async (id) => JSON.parse(await readFile(new URL(`../sources/${id}.source.json`, import.meta.url)));
 
 function fixtureHost(responses) {
@@ -170,4 +171,20 @@ test('captured live LibGen table returns 25 distinct files with exact column met
   });
   assert.equal(items[1].md5, 'd31089be7013f56ca62581589efbeb32');
   assert.equal(items[1].size, '454 kB');
+});
+
+test('LibGen zero-file response ends pagination without treating the missing table as an outage', async () => {
+  const source = await readSource('libgen');
+  const body = await readFile(new URL('./fixtures/libgen-empty.html', import.meta.url), 'utf8');
+  assert.deepEqual(await runSearch(source, 'zzpillcrowabsent729813', 1, fixtureHost([{ body }])), []);
+});
+
+test('Gutenberg next-page metadata ends scrolling while the last page still contains books', async () => {
+  const source = await readSource('gutenberg');
+  const results = [{ id: 11, title: 'Alice', formats: { 'application/epub+zip': 'https://www.gutenberg.org/ebooks/11.epub3.images' } }];
+  const last = await searchPage(source, 'Alice', 1, fixtureHost([{ body: JSON.stringify({ next: null, results }) }]));
+  assert.equal(last.items.length, 1);
+  assert.equal(last.hasMore, false);
+  const next = await searchPage(source, 'Alice', 1, fixtureHost([{ body: JSON.stringify({ next: 'https://gutendex.com/books/?page=2', results }) }]));
+  assert.equal(next.hasMore, true);
 });

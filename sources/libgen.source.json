@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -15,7 +15,7 @@
         "url": "https://libgen.li/index.php?req={query|urlencode}&columns%5B%5D=t&columns%5B%5D=a&columns%5B%5D=s&columns%5B%5D=y&columns%5B%5D=p&columns%5B%5D=i&objects%5B%5D=f&objects%5B%5D=e&objects%5B%5D=s&objects%5B%5D=a&objects%5B%5D=p&objects%5B%5D=w&topics%5B%5D=l&res=25&filesuns=all&page={page}",
         "retries": 3,
         "retryDelayMs": 1500,
-        "untilRegex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"']",
+        "untilRegex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"']|Files\\s*<span\\b[^>]*>\\s*0\\s*</span>",
         "headers": {
           "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
         }

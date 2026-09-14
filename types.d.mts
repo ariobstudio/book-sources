@@ -26,6 +26,7 @@ export interface SourceDefinition {
   capabilities: { search: boolean; resolve: boolean };
   search?: {
     steps?: Step[];
+    nextPagePath?: JSONPath;
     items: {
       jsonPath?: JSONPath;
       regex?: string;

@@ -82,7 +82,7 @@ function printJSON(value) {
 
 async function searchSource(source, query, page, host) {
   if (!source.search) throw new Error(`${source.id}: source has no search pipeline`);
-  return runSearch(source, query, page, host);
+  return (await runSearch(source, query, page, host)).items;
 }
 
 function selectResult(results, pick) {

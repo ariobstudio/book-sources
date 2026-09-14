@@ -175,7 +175,7 @@ test('installed archive exposes package imports and a working CLI without source
     const host = createFetchHost(fetch);
     const repo = createRepository(process.env.BOOK_SOURCES_REPOSITORY, host);
     const source = validateSource(await repo.load('fixture'));
-    const items = await runSearch(source, 'query', 1, host);
+    const { items } = await runSearch(source, 'query', 1, host);
     const download = await runResolve(source, items[0], host);
     console.log(JSON.stringify({ id: items[0].id, url: download.url, host: typeof createNodeHost().request }));
   `], { cwd: application, env: environment, timeout: 10000 });

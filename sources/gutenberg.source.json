@@ -1,7 +1,7 @@
 {
   "id": "gutenberg",
   "name": "Project Gutenberg",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Search Project Gutenberg ebook metadata through Gutendex.",
   "contentType": "books",
   "capabilities": {
@@ -92,7 +92,8 @@
         "title"
       ],
       "limit": 50
-    }
+    },
+    "nextPagePath": "next"
   },
   "resolve": {
     "steps": [],
