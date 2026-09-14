@@ -1,0 +1,51 @@
+{
+  "name": "book-sources",
+  "version": "0.2.1",
+  "description": "Declarative book source pipelines with a portable JavaScript engine and Node CLI",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "book-sources": "./cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./engine.d.mts",
+      "default": "./engine.mjs"
+    },
+    "./fetch-host": {
+      "types": "./fetch-host.d.mts",
+      "default": "./fetch-host.mjs"
+    },
+    "./validation": {
+      "types": "./validation.d.mts",
+      "default": "./validation.mjs"
+    },
+    "./node-host": {
+      "types": "./host.d.mts",
+      "default": "./host.mjs"
+    },
+    "./repository": {
+      "types": "./repository.d.mts",
+      "default": "./repository.mjs"
+    }
+  },
+  "scripts": {
+    "test": "node --test",
+    "validate": "node cli.mjs validate --sources-dir ./sources",
+    "cli": "node cli.mjs"
+  },
+  "files": [
+    "engine.mjs",
+    "fetch-host.mjs",
+    "repository.mjs",
+    "validation.mjs",
+    "host.mjs",
+    "cli.mjs",
+    "catalog.mjs",
+    "docs/",
+    "*.d.mts"
+  ],
+  "types": "./engine.d.mts"
+}

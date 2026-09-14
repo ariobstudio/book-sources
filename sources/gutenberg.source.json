@@ -1,0 +1,104 @@
+{
+  "id": "gutenberg",
+  "name": "Project Gutenberg",
+  "version": "0.3.1",
+  "description": "Search Project Gutenberg ebook metadata through Gutendex.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "search": {
+    "steps": [
+      {
+        "step": "request",
+        "url": "https://gutendex.com/books/?search={query|urlencode}&page={page}",
+        "retries": 2,
+        "retryDelayMs": 1000,
+        "headers": {
+          "User-Agent": "Mozilla/5.0"
+        }
+      }
+    ],
+    "items": {
+      "jsonPath": "results",
+      "fields": {
+        "id": [
+          {
+            "json": "id"
+          }
+        ],
+        "title": [
+          {
+            "json": "title"
+          }
+        ],
+        "author": [
+          {
+            "json": "authors.0.name"
+          },
+          {
+            "default": ""
+          }
+        ],
+        "language": [
+          {
+            "json": "languages.0"
+          },
+          {
+            "default": ""
+          }
+        ],
+        "coverUrl": [
+          {
+            "json": [
+              "formats",
+              "image/jpeg"
+            ]
+          },
+          {
+            "default": ""
+          }
+        ],
+        "downloadUrl": [
+          {
+            "json": [
+              "formats",
+              "application/epub+zip"
+            ]
+          },
+          {
+            "default": ""
+          }
+        ],
+        "format": [
+          {
+            "json": [
+              "formats",
+              "application/epub+zip"
+            ]
+          },
+          {
+            "regex": "epub",
+            "group": 0
+          },
+          {
+            "default": "txt"
+          }
+        ]
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "limit": 50
+    }
+  },
+  "resolve": {
+    "steps": [],
+    "output": {
+      "url": "{item.downloadUrl}",
+      "fileName": "{item.title}.{item.format|default:epub}"
+    }
+  }
+}

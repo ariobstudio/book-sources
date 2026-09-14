@@ -1,0 +1,199 @@
+{
+  "id": "libgen",
+  "name": "LibGen",
+  "version": "0.5.0",
+  "description": "Search libgen.li and download EPUB/PDF/MOBI files",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "search": {
+    "steps": [
+      {
+        "step": "request",
+        "url": "https://libgen.li/index.php?req={query|urlencode}&columns%5B%5D=t&columns%5B%5D=a&columns%5B%5D=s&columns%5B%5D=y&columns%5B%5D=p&columns%5B%5D=i&objects%5B%5D=f&objects%5B%5D=e&objects%5B%5D=s&objects%5B%5D=a&objects%5B%5D=p&objects%5B%5D=w&topics%5B%5D=l&res=25&filesuns=all&page={page}",
+        "retries": 3,
+        "retryDelayMs": 1500,
+        "untilRegex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"']",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+        }
+      },
+      {
+        "step": "set",
+        "name": "table",
+        "from": "response.body",
+        "ops": [
+          {
+            "regex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"'][^>]*>([\\s\\S]*?)</table>",
+            "flags": "i",
+            "group": 1
+          }
+        ]
+      }
+    ],
+    "items": {
+      "over": "{table}",
+      "regex": "<tr[^>]*>([\\s\\S]*?)</tr>",
+      "group": 1,
+      "fields": {
+        "md5": [
+          {
+            "regex": "md5=([0-9a-f]{32})",
+            "flags": "i",
+            "group": 1
+          },
+          {
+            "lowercase": true
+          }
+        ],
+        "id": [
+          {
+            "regex": "md5=([0-9a-f]{32})",
+            "flags": "i",
+            "group": 1
+          },
+          {
+            "lowercase": true
+          }
+        ],
+        "title": [
+          {
+            "cell": 0
+          },
+          {
+            "anchors": {
+              "hrefIncludes": "edition.php",
+              "pick": "clean",
+              "part": "text"
+            }
+          },
+          {
+            "stripTags": true
+          }
+        ],
+        "author": [
+          {
+            "cell": 1
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "default": ""
+          }
+        ],
+        "publisher": [
+          {
+            "cell": 2
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "default": ""
+          }
+        ],
+        "year": [
+          {
+            "cell": 3
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "default": ""
+          }
+        ],
+        "language": [
+          {
+            "cell": 4
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "default": ""
+          }
+        ],
+        "size": [
+          {
+            "cell": 6
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "default": ""
+          }
+        ],
+        "format": [
+          {
+            "cell": 7
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "lowercase": true
+          },
+          {
+            "regex": "\\b(epub|pdf|mobi|azw3?|fb2|djvu|cbz|cbr)\\b",
+            "group": 0
+          }
+        ]
+      },
+      "required": [
+        "md5",
+        "title"
+      ],
+      "limit": 50
+    }
+  },
+  "resolve": {
+    "steps": [
+      {
+        "step": "request",
+        "url": "https://libgen.li/ads.php?md5={item.md5}",
+        "retries": 3,
+        "retryDelayMs": 1500,
+        "untilRegex": "get\\.php\\?md5=[0-9a-fA-F]{32}&(?:amp;)?key=[a-zA-Z0-9]+",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+        }
+      },
+      {
+        "step": "set",
+        "name": "keyed",
+        "from": "response.body",
+        "ops": [
+          {
+            "regex": "get\\.php\\?md5=[0-9a-f]{32}&(?:amp;)?key=[a-z0-9]+",
+            "flags": "i",
+            "group": 0
+          },
+          {
+            "stripTags": true
+          }
+        ]
+      },
+      {
+        "step": "set",
+        "name": "directUrl",
+        "ops": [
+          {
+            "template": "https://libgen.li/{keyed|trimSlash}"
+          }
+        ]
+      }
+    ],
+    "output": {
+      "url": "{directUrl}",
+      "fileName": "{item.title}.{item.format|default:epub}",
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+      }
+    }
+  }
+}
