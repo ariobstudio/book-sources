@@ -143,13 +143,18 @@ ISBN/title disambiguation, empty versus unavailable results, and absolute or
 HTML-escaped download links. Sources are declarative data, never executable code.
 
 Live checks on 2026-09-14 parsed two distinct LibGen pages of 25 records and a
-Gutenberg/Gutendex response of 32 records. LibGen requires the User-Agent header
-included in its JSON pack; otherwise it can return an nginx placeholder with
-HTTP 200. Its download landing pages returned empty HTTP 200 responses during
-this check, so live LibGen downloading is **not verified**. The parser rejects
-those responses instead of reporting a successful download. Gutenberg's Alice
-record resolves to the publisher's EPUB and cover URLs. Provider availability
-can change independently of these tests.
+Gutenberg/Gutendex response of 32 records. LibGen needs the User-Agent and Referer
+headers included in its source pack. Without Referer, image and download landing
+requests can return empty HTTP 200 responses. With it, an edition cover returned
+55,158 JPEG bytes and a Lewis Carroll EPUB download returned a valid 1,024-byte
+ZIP range (64,490,986 bytes total). This verifies resolution and initial bytes,
+not a complete LibGen import. Gutenberg's Alice EPUB was downloaded completely.
 
-The LibGen search table does not supply cover images. Consumers should use a
-placeholder until importing the original book, rather than inventing a cover.
+LibGen's optional `cover` pipeline reads the actual image URL from the selected
+edition page, including file covers when an edition cover is absent. Consumers
+call `runCover(source, item, host)` independently of search and pass returned
+headers with the image request (the CLI does this). Apps whose image element
+cannot set headers can fetch bounded image bytes in the background and pass a
+local/data URI. Missing covers retain title/author placeholders.
+Search also returns page count, publisher, year, language, and file size when
+available. Provider availability can change independently of these tests.

@@ -160,5 +160,6 @@ export function validateSource(source) {
   check(source.search != null || source.resolve != null, path, 'expected a search or resolve pipeline');
   if (source.search != null) search(source.search, `${path}.search`);
   if (source.resolve != null) resolve(source.resolve, `${path}.resolve`);
+  if (source.cover != null) resolve(source.cover, `${path}.cover`);
   return source;
 }

@@ -64,7 +64,7 @@ before(async () => {
       steps: [{ step: 'request', url: `${baseURL}/search?q={query|urlencode}&page={page}` }],
       items: { jsonPath: 'results', fields: {
         id: [{ json: 'id' }], title: [{ json: 'title' }], downloadUrl: [{ json: 'url' }],
-        coverUrl: [{ json: 'cover' }, { default: '' }], format: [{ json: 'format' }],
+        coverUrl: [{ json: 'cover' }, { default: '' }], coverReferer: [{ template: 'https://catalog.example/' }], format: [{ json: 'format' }],
       }, required: ['id', 'title'] },
     },
     resolve: { output: { url: '{item.downloadUrl}', fileName: '{item.title}.epub', headers: { 'X-Fixture': 'resolve-header' } } },
@@ -114,6 +114,7 @@ test('book downloads preserve exact ID precedence, headers, and output extension
 test('cover command fetches bytes and uses the image content type for the filename', async () => {
   await custom('cover', 'fixture', 'query', '9');
   assert.deepEqual(await readFile(join(directory, 'fixture-9-cover.jpg')), jpeg);
+  assert.ok(requests.some(request => request.url === '/cover' && request.headers.referer === 'https://catalog.example/'));
   await custom('cover', 'fixture', 'query', '9', '--output', join(directory, 'cover'));
   assert.deepEqual(await readFile(join(directory, 'cover.jpg')), jpeg);
 });

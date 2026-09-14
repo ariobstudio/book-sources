@@ -2,7 +2,7 @@
 /** Node entry point. Source interpretation stays in the portable engine. */
 import { writeFile } from 'node:fs/promises';
 import { createNodeHost } from './host.mjs';
-import { runSearch, runResolve } from './engine.mjs';
+import { runSearch, runResolve, runCover } from './engine.mjs';
 import { listSources, loadSourceDefinition } from './catalog.mjs';
 import { createRepository } from './repository.mjs';
 
@@ -135,9 +135,10 @@ async function downloadBook(source, item, destination, host) {
   await saveResponse(response, bookPath(response, source, item, destination));
 }
 
-async function downloadCover(source, item, destination) {
-  if (!item.coverUrl) throw new Error(`${source.id}: result "${item.id}" has no cover URL`);
-  const response = await fetchDownload(item.coverUrl);
+async function downloadCover(source, item, destination, host) {
+  const cover = await runCover(source, item, host);
+  if (!cover) throw new Error(`${source.id}: result "${item.id}" has no cover URL`);
+  const response = await fetchDownload(cover.url, cover.headers);
   await saveResponse(response, coverPath(response, source, item, destination));
 }
 
@@ -176,7 +177,7 @@ async function runCommand(command, args, options) {
   const results = await searchSource(source, query, command === 'search' ? selection : 1, host);
   if (command === 'search') return options.json ? printJSON(results) : printResults(results);
   const item = selectResult(results, selection);
-  if (command === 'cover') return downloadCover(source, item, options.destination);
+  if (command === 'cover') return downloadCover(source, item, options.destination, host);
   return downloadBook(source, item, options.destination, host);
 }
 

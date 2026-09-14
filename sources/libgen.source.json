@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -17,7 +17,8 @@
         "retryDelayMs": 1500,
         "untilRegex": "<table\\b[^>]*\\bid\\s*=\\s*[\"']tablelibgen[\"']|Files\\s*<span\\b[^>]*>\\s*0\\s*</span>",
         "headers": {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
+          "Referer": "https://libgen.li/"
         }
       },
       {
@@ -142,6 +143,38 @@
             "regex": "\\b(epub|pdf|mobi|azw3?|fb2|djvu|cbz|cbr)\\b",
             "group": 0
           }
+        ],
+        "pages": [
+          {
+            "cell": 5
+          },
+          {
+            "stripTags": true
+          },
+          {
+            "regex": "(?:^|/\\s*)([1-9]\\d*)\\s*(?:pages?|$)",
+            "flags": "i",
+            "group": 1
+          },
+          {
+            "default": ""
+          }
+        ],
+        "editionID": [
+          {
+            "cell": 0
+          },
+          {
+            "anchors": {
+              "hrefIncludes": "edition.php",
+              "pick": "clean",
+              "part": "href"
+            }
+          },
+          {
+            "regex": "id=(\\d+)",
+            "group": 1
+          }
         ]
       },
       "required": [
@@ -160,7 +193,8 @@
         "retryDelayMs": 1500,
         "untilRegex": "get\\.php\\?md5=[0-9a-fA-F]{32}&(?:amp;)?key=[a-zA-Z0-9]+",
         "headers": {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
+          "Referer": "https://libgen.li/"
         }
       },
       {
@@ -192,7 +226,50 @@
       "url": "{directUrl}",
       "fileName": "{item.title}.{item.format|default:epub}",
       "headers": {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15"
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
+        "Referer": "https://libgen.li/"
+      }
+    }
+  },
+  "cover": {
+    "steps": [
+      {
+        "step": "request",
+        "url": "https://libgen.li/edition.php?id={item.editionID}",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
+          "Referer": "https://libgen.li/"
+        }
+      },
+      {
+        "step": "set",
+        "name": "coverPath",
+        "ops": [
+          {
+            "regex": "<img\\b[^>]*\\bsrc=[\\\"\\x27](/(?:editioncovers|covers)/[^\\\"\\x27]+)",
+            "flags": "i",
+            "group": 1
+          }
+        ]
+      },
+      {
+        "step": "set",
+        "name": "coverUrl",
+        "ops": [
+          {
+            "template": "https://libgen.li{coverPath}"
+          },
+          {
+            "regex": "^https://libgen\\.li/(?:editioncovers|covers)/.+",
+            "group": 0
+          }
+        ]
+      }
+    ],
+    "output": {
+      "url": "{coverUrl}",
+      "headers": {
+        "Referer": "https://libgen.li/"
       }
     }
   }

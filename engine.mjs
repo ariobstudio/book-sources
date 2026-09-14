@@ -258,3 +258,12 @@ export async function runResolve(source, item, host) {
   if (!output.url) throw new Error(`${source.id}: resolve produced no url`);
   return output;
 }
+
+/** Look up the actual optional cover on an edition page, independently of search. */
+export async function runCover(source, item, host) {
+  if (!source.cover) return item.coverUrl ? { url: item.coverUrl, headers: item.coverReferer ? { Referer: item.coverReferer } : undefined } : null;
+  const vars = { __sourceId: source.id, query: '', page: 1, item };
+  await runSteps(source.cover.steps, vars, host);
+  const output = Object.fromEntries(Object.entries(source.cover.output).map(([key, value]) => [key, typeof value === 'string' ? interpolate(value, vars) : value]));
+  return output.url ? output : null;
+}

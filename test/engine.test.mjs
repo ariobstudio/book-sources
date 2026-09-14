@@ -65,8 +65,10 @@ test('LibGen keeps quote-aware title selection, required fields, and resolve ste
     { body: `<a href="/get.php?md5=${md5}&key=ABC123">Get</a>` },
   ]);
   const results = await runSearch(source, 'query', 1, host);
-  assert.deepEqual(results, [{ md5, id: md5, title: 'The & Book', author: 'Author', publisher: 'Publisher', year: '2024', language: 'English', size: '2 MB', format: 'epub' }]);
+  assert.deepEqual(results, [{ md5, id: md5, title: 'The & Book', author: 'Author', publisher: 'Publisher', year: '2024', language: 'English', size: '2 MB', format: 'epub', pages: '', editionID: '1' }]);
   assert.ok(host.calls[0].url.endsWith('&page=1'));
+  assert.equal(source.resolve.steps[0].headers.Referer, 'https://libgen.li/');
+  assert.equal(source.resolve.output.headers.Referer, 'https://libgen.li/');
   assert.deepEqual(await runResolve(source, results[0], host), { url: `https://libgen.li/get.php?md5=${md5}&key=ABC123`, fileName: 'The & Book.epub', headers: source.resolve.output.headers });
 });
 
@@ -133,7 +135,7 @@ test('LibGen accepts reordered table attributes and single-quoted links without 
   const row = `<tr><td><a title='<br>scan' href='edition.php?id=2'>Alice &amp; Friends</a><a href='edition.php?id=2'>9781234567890; X</a></td><td>Carroll, Lewis</td><td>Publisher</td><td>1865</td><td>English</td><td>200</td><td>4 MB</td><td>EPUB</td><td><a href='ads.php?md5=${md5.toUpperCase()}'>Get</a></td></tr>`;
   const host = fixtureHost([{ body: `<table data-layout='books' id='tablelibgen' class='table responsive table-striped'><tr><th>Title</th></tr>${row}</table>` }]);
   const [book] = await runSearch(source, 'Alice', 2, host);
-  assert.deepEqual(book, { md5, id: md5, title: 'Alice & Friends', author: 'Carroll, Lewis', publisher: 'Publisher', year: '1865', language: 'English', size: '4 MB', format: 'epub' });
+  assert.deepEqual(book, { md5, id: md5, title: 'Alice & Friends', author: 'Carroll, Lewis', publisher: 'Publisher', year: '1865', language: 'English', size: '4 MB', format: 'epub', pages: '200', editionID: '2' });
   assert.match(host.calls[0].options.headers['User-Agent'], /Mozilla/);
 });
 
@@ -168,6 +170,7 @@ test('captured live LibGen table returns 25 distinct files with exact column met
     md5: 'f84db86464adfe0bbb8741ac73d924a0', id: 'f84db86464adfe0bbb8741ac73d924a0',
     title: 'Trapped in Wonderland First edition paperback', author: '(Fictitious character from Carroll) Alice;Hoots, Dani',
     publisher: '', year: '2017', language: 'English', size: '328 kB', format: 'epub',
+    pages: '282', editionID: '140746421',
   });
   assert.equal(items[1].md5, 'd31089be7013f56ca62581589efbeb32');
   assert.equal(items[1].size, '454 kB');
@@ -187,4 +190,17 @@ test('Gutenberg next-page metadata ends scrolling while the last page still cont
   assert.equal(last.hasMore, false);
   const next = await searchPage(source, 'Alice', 1, fixtureHost([{ body: JSON.stringify({ next: 'https://gutendex.com/books/?page=2', results }) }]));
   assert.equal(next.hasMore, true);
+});
+
+ test('LibGen resolves actual edition or file covers, and treats missing covers as optional', async () => {
+  const { runCover } = await import('../engine.mjs');
+  const source = await readSource('libgen');
+  for (const path of ['/editioncovers/137868000/137868366.jpg', '/covers/4544000/abc.jpg']) {
+    const host = fixtureHost([{ body: `<img src="/img/logo.png"><img class="img-fluid" src="${path}">` }]);
+    const cover = await runCover(source, { editionID: '137868366' }, host);
+    assert.equal(cover.url, `https://libgen.li${path}`);
+    assert.equal(cover.headers.Referer, 'https://libgen.li/');
+    assert.equal(host.calls[0].url, 'https://libgen.li/edition.php?id=137868366');
+  }
+  assert.equal(await runCover(source, { editionID: '1' }, fixtureHost([{ body: '<img src="/img/logo.png">' }])), null);
 });
