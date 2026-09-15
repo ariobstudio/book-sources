@@ -28,3 +28,14 @@ test('LibGen uses advertised torrent links and never treats an edition MD5 as a 
   }
   await assert.rejects(runTorrent(s, { md5: 'a'.repeat(32) }, { request: async () => ({ status: 200, body: '<a href="get.php?key=direct">Get</a>' }) }), /no url/);
 });
+
+test('Nyaa maps literature and quality filters to the site and hides only explicitly labeled novels', async () => {
+  const calls = [], s = await source('nyaa');
+  const host = { request: async url => { calls.push(new URL(url)); return { status: 200, body: `<table class="torrent-list"><tbody>${row(1,'3_3')}${row(2,'3_3').replace('Little Nemo &amp; friends', 'Example [LN]')}${row(3,'3_3').replace('Little Nemo &amp; friends', 'Example Light Novel')}${row(4,'3_3').replace('Little Nemo &amp; friends', 'Unlabelled collection')}</tbody></table><ul class="pagination"><li><a rel="next">Next</a></li></ul>` }; } };
+  const found = await runSearch(s, 'example', 3, host, { nyaaCategory: 'raw', nyaaQuality: 'trusted', nyaaHideNovels: true });
+  assert.equal(calls[0].searchParams.get('c'), '3_3'); assert.equal(calls[0].searchParams.get('f'), '2'); assert.equal(calls[0].searchParams.get('p'), '3');
+  assert.deepEqual(found.items.map(item => item.id), ['1', '4']); assert.equal(found.hasMore, true);
+  assert.ok(found.items.every(item => item.language === ''));
+  const all = await runSearch(s, 'example', 4, host, { nyaaCategory: 'nonEnglish', nyaaQuality: 'noRemakes', nyaaHideNovels: false });
+  assert.equal(calls[1].searchParams.get('c'), '3_2'); assert.equal(calls[1].searchParams.get('f'), '1'); assert.equal(all.items.length, 4);
+});

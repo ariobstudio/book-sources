@@ -6,7 +6,9 @@ export async function search(source, query, page, host, filters = {}) {
   target.searchParams.set('q', query);
   target.searchParams.set('p', String(page));
   // Literature only. Raw/non-English categories do not identify a language.
-  target.searchParams.set('c', filters.language === 'en' ? '3_1' : '3_0');
+  const categories = { all: '3_0', english: '3_1', nonEnglish: '3_2', raw: '3_3' };
+  target.searchParams.set('c', categories[filters.nyaaCategory] || (filters.language === 'en' ? '3_1' : '3_0'));
+  target.searchParams.set('f', filters.nyaaQuality === 'trusted' ? '2' : filters.nyaaQuality === 'noRemakes' ? '1' : '0');
   const tree = dom((await request(host, target.href)).body);
   const items = all(tree, '.torrent-list tbody tr').flatMap(row => {
     const cells = all(row, 'td');
@@ -18,7 +20,11 @@ export async function search(source, query, page, host, filters = {}) {
     const magnet = attr(links.find(link => attr(link, 'href').startsWith('magnet:?')), 'href');
     const torrent = attr(links.find(link => /^\/download\/\d+\.torrent$/.test(attr(link, 'href'))), 'href');
     if (!magnet && !torrent) return [];
-    return [{ id, title: text(titleLink), author: '', format: 'torrent', delivery: 'torrent',
+    const title = text(titleLink);
+    // Nyaa groups manga and novels together. Only hide explicit novel labels;
+    // ambiguous titles stay visible, and this is never claimed as manga detection.
+    if (filters.nyaaHideNovels && /\b(?:light[ -]*novels?|novels?)\b|\[(?:LN|WN)\]/i.test(title)) return [];
+    return [{ id, title, author: '', format: 'torrent', delivery: 'torrent',
       magnet, torrentUrl: torrent ? url(torrent, source.baseUrl) : '',
       language: category.includes('3_1') ? 'en' : '', size: text(cells[3]),
       seeds: text(cells[5]), detailUrl: url(`/view/${id}`, source.baseUrl) }];

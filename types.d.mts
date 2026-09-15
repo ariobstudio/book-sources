@@ -101,4 +101,4 @@ export interface Repository {
 export interface SourceChapter { id: string; title: string; number?: string; language?: string; group?: string; pages?: number; }
 export interface ChapterImage { url: string; headers?: Record<string, string>; report?: boolean; }
 
-export interface SourceSearchFilters { language?: string; }
+export interface SourceSearchFilters { language?: string; nyaaCategory?: 'auto' | 'all' | 'english' | 'nonEnglish' | 'raw'; nyaaQuality?: 'all' | 'noRemakes' | 'trusted'; nyaaHideNovels?: boolean; }
