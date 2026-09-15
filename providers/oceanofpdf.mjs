@@ -19,7 +19,7 @@ export async function resolve(source, item, host) {
   const response = await request(host, selected.endpoint, { method: 'POST', headers: { ...headers(item.detailUrl), 'Content-Type': 'application/x-www-form-urlencoded' }, body: form({ id: selected.id, filename: selected.fileName }) });
   const refresh = header(response, 'refresh').match(/(?:^|;)\s*url\s*=\s*["']?([^\r\n]+?)["']?\s*$/i)?.[1];
   if (!refresh) throw new Error('This source requires a browser download instead of a direct EPUB link.');
-  const target = url(refresh.replaceAll('&amp;', '&'), selected.endpoint); const parsed = new URL(target);
+  const target = url(refresh.replace(/&amp;/g, '&'), selected.endpoint); const parsed = new URL(target);
   if (parsed.origin !== new URL(selected.endpoint).origin || parsed.pathname !== '/download.php' || parsed.searchParams.get('filename') !== selected.fileName || !parsed.searchParams.get('token') || parsed.searchParams.getAll('filename').length !== 1) throw new Error('The source returned an unexpected download redirect.');
   const cookie = header(response, 'set-cookie').split(/,(?=\s*[^\s;,=]+=)/).map(value => value.split(';')[0].trim()).filter(value => /^[^\s;,=]+=[^\r\n;]*$/.test(value)).join('; ');
   return download(item, target, { fileName: selected.fileName, headers: { Referer: selected.endpoint, ...(cookie ? { Cookie: cookie } : {}) } });
