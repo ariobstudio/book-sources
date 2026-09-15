@@ -3,9 +3,9 @@ import { json, page, url } from './common.mjs';
 const base = 'https://api.mangadex.org';
 const options = { headers: { Accept: 'application/json', 'User-Agent': 'Pillcrow/0.7 (https://pillcrow.app)' } };
 const id = value => { if (!/^[a-f0-9-]{36}$/i.test(String(value))) throw new Error('Invalid MangaDex identifier.'); return value; };
-export async function search(source, query, index, host) {
+export async function search(source, query, index, host, filters = {}) {
   const offset = (Math.max(1, index) - 1) * 20;
-  const data = await json(host, `${base}/manga?title=${encodeURIComponent(query)}&limit=20&offset=${offset}&includes[]=cover_art&includes[]=author&order[relevance]=desc`, options);
+  const data = await json(host, `${base}/manga?title=${encodeURIComponent(query)}&limit=20&offset=${offset}&includes[]=cover_art&includes[]=author&order[relevance]=desc${filters.language ? `&availableTranslatedLanguage[]=${encodeURIComponent(filters.language)}` : ''}`, options);
   if (!Array.isArray(data.data)) throw new Error('MangaDex returned an invalid catalog.');
   return page(data.data.map(manga => {
     const a = manga.attributes ?? {}, relationships = manga.relationships ?? [];
@@ -13,7 +13,7 @@ export async function search(source, query, index, host) {
     const title = a.title?.en || a.title?.['ja-ro'] || Object.values(a.title ?? {})[0];
     return { id: manga.id, title, format: 'cbz', delivery: 'chapters',
       author: relationships.filter(r => r.type === 'author').map(r => r.attributes?.name).filter(Boolean).join(', '),
-      description: a.description?.en, language: a.originalLanguage,
+      description: a.description?.en, language: a.originalLanguage, availableLanguages: a.availableTranslatedLanguages ?? [], chapterLanguage: filters.language,
       // MangaDex supplies no reading-direction field. Japanese defaults to RTL;
       // other languages use LTR. The chapter picker exposes an explicit override.
       direction: a.originalLanguage === 'ja' ? 'rtl' : 'ltr',
@@ -22,7 +22,7 @@ export async function search(source, query, index, host) {
 }
 export async function chapters(source, item, index, host) {
   const offset = (Math.max(1, index) - 1) * 50;
-  const data = await json(host, `${base}/manga/${id(item.id)}/feed?limit=50&offset=${offset}&order[volume]=asc&order[chapter]=asc&includes[]=scanlation_group&includeEmptyPages=0&includeFuturePublishAt=0&includeExternalUrl=0`, options);
+  const data = await json(host, `${base}/manga/${id(item.id)}/feed?limit=50&offset=${offset}&order[volume]=asc&order[chapter]=asc&includes[]=scanlation_group&includeEmptyPages=0&includeFuturePublishAt=0&includeExternalUrl=0${item.chapterLanguage ? `&translatedLanguage[]=${encodeURIComponent(item.chapterLanguage)}` : ''}`, options);
   if (!Array.isArray(data.data)) throw new Error('MangaDex returned an invalid chapter list.');
   return { items: data.data.filter(c => c.attributes?.pages > 0 && !c.attributes.externalUrl && (!c.attributes.publishAt || Date.parse(c.attributes.publishAt) <= Date.now())).map(c => {
     const a = c.attributes;

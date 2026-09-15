@@ -1,12 +1,12 @@
 {
   "id": "book-sources",
   "name": "Book Sources",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "sources": [
     {
       "id": "libgen",
       "name": "LibGen",
-      "version": "0.5.5",
+      "version": "0.5.6",
       "description": "Search libgen.li and download EPUB/PDF/MOBI files",
       "contentType": "books",
       "sourceUrl": "sources/libgen.source.json"
@@ -159,6 +159,16 @@
         "chapters": true
       },
       "sourceUrl": "sources/webtoons.source.json"
+    },
+    {
+      "id": "atsumaru",
+      "name": "Atsumaru",
+      "version": "1.0.0",
+      "description": "Browse English manga, manhwa and manhua chapters and save their original images as CBZ.",
+      "contentType": "manga",
+      "provider": "atsumaru",
+      "baseUrl": "https://atsu.moe",
+      "sourceUrl": "sources/atsumaru.source.json"
     }
   ]
 }

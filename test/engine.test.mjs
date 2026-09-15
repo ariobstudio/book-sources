@@ -216,3 +216,14 @@ test('LibGen stops at the actual last page instead of showing a retry error afte
     assert.equal(result.hasMore, expected, `page ${page}, total ${total}`);
   }
 });
+
+test('LibGen preserves a download server and query ordering, and reports an upstream outage clearly', async () => {
+ const source=await readSource('libgen');source.resolve.steps[0].retries=1;
+ const md5='c'.repeat(32);
+ for(const href of [`https://download.library.test/get.php?key=abc-123&amp;md5=${md5}`,`//download.library.test/get.php?md5=${md5}&amp;key=abc_123`]){
+  const result=await runResolve(source,{md5,title:'Original',format:'epub'},fixtureHost([{body:`<a href="${href}">GET</a>`}]));
+  assert.equal(new URL(result.url).hostname,'download.library.test');assert.equal(new URL(result.url).searchParams.get('md5'),md5);
+ }
+ await assert.rejects(runResolve(source,{md5},fixtureHost([{body:'<title>Welcome to nginx!</title>'}])),/source server is unavailable/);
+ await assert.rejects(runResolve(source,{md5},fixtureHost([{body:`<a href="get.php?md5=${md5}">GET</a>`}])),/no url/);
+});

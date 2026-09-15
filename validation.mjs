@@ -1,7 +1,7 @@
 import { providerIDs } from './providers/index.mjs';
 /** Validate source packs at load time without importing platform APIs. */
 
-const OPERATIONS = ['regex', 'cell', 'anchors', 'json', 'stripTags', 'trim', 'lowercase', 'default', 'prepend', 'append', 'template'];
+const OPERATIONS = ['regex', 'cell', 'anchors', 'json', 'stripTags', 'trim', 'lowercase', 'default', 'prepend', 'append', 'template', 'resolveURL'];
 const RESERVED_KEYS = ['__proto__', 'prototype', 'constructor'];
 const RESERVED_VARIABLES = [...RESERVED_KEYS, 'query', 'page', 'item', '__sourceId', '__res'];
 
@@ -164,7 +164,7 @@ export function validateSource(source) {
     const base = new URL(source.baseUrl);
     check(base.protocol === 'https:' && !base.username && !base.password, `${path}.baseUrl`, 'expected HTTPS without credentials');
     check(source.capabilities.search === true && source.capabilities.resolve === true, path, 'download adapters require search and resolve');
-    if (source.capabilities.chapters !== undefined) check(source.capabilities.chapters === true && ['mangadex', 'webtoons'].includes(source.provider), path, 'adapter does not support chapters');
+    if (source.capabilities.chapters !== undefined) check(source.capabilities.chapters === true && ['mangadex', 'webtoons', 'atsumaru'].includes(source.provider), path, 'adapter does not support chapters');
     check(source.search == null && source.resolve == null && source.cover == null, path, 'adapters cannot also contain pipelines');
     if (source.configuration !== undefined) {
       check(Array.isArray(source.configuration), `${path}.configuration`, 'expected an array');

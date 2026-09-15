@@ -9,7 +9,7 @@ executed. Adapters are independently implemented against the public protocols.
 
 | Source | Path | Verification on September 14, 2026 |
 | --- | --- | --- |
-| LibGen | Existing EPUB/CBZ JSON pipeline | Existing fixture suite retained |
+| LibGen | Existing EPUB/CBZ JSON pipeline | Absolute download hosts and query ordering fixture-tested; live search and ads returned nginx placeholder pages |
 | Project Gutenberg | Existing EPUB JSON pipeline | Existing fixture suite retained |
 | Bookracy | Direct EPUB/CBZ | Fixtures pass; live API returned HTTP 403 |
 | Anna’s Archive | Exposed EPUB links; optional supporter key | Fixtures pass; live search returned HTTP 403 |
@@ -19,6 +19,7 @@ executed. Adapters are independently implemented against the public protocols.
 | Z-Library | Anonymous search; account-backed EPUB/CBZ resolution | Live search passed; login/quota/download flows fixture-tested without an account |
 | OPDS catalog | Configured Atom/OpenSearch acquisitions | Authentication, namespaces and pagination fixture-tested; requires a user server |
 | MangaDex | Chapter images → local CBZ | Live search, chapter feed and original-resolution image lists passed; package/import tested with public-domain comics |
+| Atsumaru | English chapter images → local CBZ | Live search, cover URL, 22 chapters and 424 page URLs verified for Astro Boy; no commercial page bodies downloaded; WebP import tested with public-domain Little Nemo |
 | WEBTOON | Public episode images → local CBZ | Live search, episode pagination and image lists passed; package/import tested with public-domain comics |
 
 A successful adapter test is not a promise of provider uptime. Browser challenges,
@@ -29,7 +30,7 @@ No Cloudflare, paywall, DRM or login bypass is implemented.
 
 Asura Scans exposes scrambled image tiles in addition to ordinary images. A
 correct tile renderer is needed before enabling it; treating those URLs as normal
-pages would corrupt the artwork. Atsumaru, MangaK, MangaKakalot, ReadComicOnline,
+pages would corrupt the artwork. MangaK, MangaKakalot, ReadComicOnline,
 WeebCentral, ComicKFan, GoComics, ComicHubFree, BatCave, BBato and ReadAllComics
 have not yet been ported and verified. They are not advertised in this catalog.
 
@@ -61,3 +62,11 @@ Chapter packaging is cancellable and continues when leaving Sources for Library,
 but it does not yet survive application termination or resume partial chapters.
 This limitation is stated before downloading. Existing native background EPUB/CBZ
 file transfers are unchanged.
+
+Nyaa was inspected: its Literature listings provide `.torrent` and magnet links,
+not direct book files. Integration requires an external torrent client or a user-configured
+download service. It is not advertised as a direct EPUB/CBZ source. WeebCentral
+returned a Cloudflare block in this environment and was not added.
+
+Language search uses chapter translation availability on MangaDex, with the same
+filter sent to chapter feeds. Original-language metadata stays intact.

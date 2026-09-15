@@ -28,3 +28,24 @@ test('WEBTOON keeps episode order across pagination, preserves original image or
  assert.deepEqual(pages.map(p=>p.url),['https://image.test/z.jpg?a=1&b=2','https://image.test/a.png']);assert.match(pages[0].headers.Referer,/episode_no=3/);
  await assert.rejects(runPages(s,ch.items[0],host('<p>Open in the app</p>')),/locked/);
 });
+test('MangaDex filters translated chapters without confusing original language with reading language', async () => {
+ const s=await source('mangadex'), calls=[];
+ const h={request:async url=>{calls.push(new URL(url));return {status:200,headers:{},body:JSON.stringify(url.includes('/feed?')?{data:[],total:0}:{data:[{id:uuid,attributes:{title:{en:'Original'},originalLanguage:'ja',availableTranslatedLanguages:['en','fr']}}],total:1})}}};
+ const result=await runSearch(s,'Original',1,h,{language:'en'});
+ assert.equal(calls[0].searchParams.get('availableTranslatedLanguage[]'),'en');
+ assert.equal(result.items[0].language,'ja');assert.deepEqual(result.items[0].availableLanguages,['en','fr']);
+ await runChapters(s,result.items[0],2,h);
+ assert.equal(calls[1].searchParams.get('translatedLanguage[]'),'en');assert.equal(calls[1].searchParams.get('offset'),'50');
+});
+test('Atsumaru searches, orders chapters, and keeps WebP image URLs in their original page order', async () => {
+ const s=await source('atsumaru');
+ const result=await runSearch(s,'Nemo',1,host({found:22,hits:[{document:{id:'Nemo',title:'Nemo',poster:'/static/posters/nemo.jpg',type:'Manwha',authors:['Artist']}}]}));
+ assert.equal(result.hasMore,true);assert.equal(result.items[0].coverUrl,'https://atsu.moe/static/posters/nemo.jpg');assert.equal(result.items[0].direction,'ltr');
+ const chapters=await runChapters(s,result.items[0],1,host({chapters:[{id:'two',number:2,pageCount:2},{id:'one',number:1,pageCount:2},{id:'empty',number:0,pageCount:0}]}));
+ assert.deepEqual(chapters.items.map(c=>c.id),['Nemo/one','Nemo/two']);
+ const pages=await runPages(s,chapters.items[0],host({readChapter:{pages:[{image:'/static/pages/10.webp'},{image:'/static/pages/2.webp'}]}}));
+ assert.deepEqual(pages.map(p=>p.url),['https://atsu.moe/static/pages/10.webp','https://atsu.moe/static/pages/2.webp']);
+ assert.equal(pages[0].headers.Referer,'https://atsu.moe/');
+ assert.deepEqual(await runSearch(s,'Nemo',1,{request:()=>{throw Error('must not request')}},{language:'ja'}),{items:[],hasMore:false});
+ await assert.rejects(runPages(s,{id:'Nemo/one'},host({readChapter:{pages:[{image:'/one.webp'},{}]}})),/complete/);
+});

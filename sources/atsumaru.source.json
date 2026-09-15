@@ -1,0 +1,14 @@
+{
+  "id": "atsumaru",
+  "name": "Atsumaru",
+  "version": "1.0.0",
+  "description": "Browse English manga, manhwa and manhua chapters and save their original images as CBZ.",
+  "contentType": "manga",
+  "provider": "atsumaru",
+  "baseUrl": "https://atsu.moe",
+  "capabilities": {
+    "search": true,
+    "resolve": true,
+    "chapters": true
+  }
+}

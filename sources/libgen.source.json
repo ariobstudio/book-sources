@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -206,7 +206,7 @@
         "url": "https://libgen.li/ads.php?md5={item.md5}",
         "retries": 3,
         "retryDelayMs": 1500,
-        "untilRegex": "get\\.php\\?md5=[0-9a-fA-F]{32}&(?:amp;)?key=[a-zA-Z0-9]+",
+        "untilRegex": "get\\.php\\?[^\"\\s<>]*",
         "headers": {
           "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
           "Referer": "https://libgen.li/"
@@ -218,12 +218,15 @@
         "from": "response.body",
         "ops": [
           {
-            "regex": "get\\.php\\?md5=[0-9a-f]{32}&(?:amp;)?key=[a-z0-9]+",
+            "regex": "(?:https://[^/\"'\\s<>]+|//[^/\"'\\s<>]+)?/?get\\.php\\?(?=[^\"'\\s<>]*\\bmd5=[0-9a-f]{32})(?=[^\"'\\s<>]*\\bkey=[a-z0-9%_-]+)[^\"'\\s<>]+",
             "flags": "i",
             "group": 0
           },
           {
             "stripTags": true
+          },
+          {
+            "resolveURL": "https://libgen.li/"
           }
         ]
       },
@@ -232,7 +235,7 @@
         "name": "directUrl",
         "ops": [
           {
-            "template": "https://libgen.li/{keyed|trimSlash}"
+            "template": "{keyed}"
           }
         ]
       }

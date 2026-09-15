@@ -262,3 +262,14 @@ missing counts stop continuation. The two continuation fields are mutually
 exclusive. Without either field, the engine continues until a parsed page is empty.
 Apply application format filters after interpreting `hasMore`; a page containing
 only unsupported formats must not prevent the next page from loading.
+
+### Relative download URLs
+
+The `resolveURL` operation resolves the current value against its HTTPS base.
+It preserves absolute download hosts and rejects credentials and non-HTTPS URLs:
+`{"resolveURL":"https://libgen.li/"}`. Missing input remains empty.
+
+`runSearch` accepts an optional fifth argument, `{ language: "en" }`.
+MangaDex filters translation availability and carries the language to chapter feeds;
+Atsumaru returns English chapters. Hosts must filter metadata for adapters that
+do not support server-side language filters.

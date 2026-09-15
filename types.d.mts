@@ -11,6 +11,7 @@ export type Operation =
   | { default: unknown }
   | { prepend: string }
   | { append: string }
+  | { resolveURL: string }
   | { template: string }
   | null;
 export type Operations = Operation | Operation[];
@@ -98,3 +99,5 @@ export interface Repository {
 
 export interface SourceChapter { id: string; title: string; number?: string; language?: string; group?: string; pages?: number; }
 export interface ChapterImage { url: string; headers?: Record<string, string>; report?: boolean; }
+
+export interface SourceSearchFilters { language?: string; }

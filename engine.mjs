@@ -121,6 +121,12 @@ function applyOperation(value, operation, vars) {
   if ('default' in operation) return value == null || value === '' ? operation.default : value;
   if ('prepend' in operation) return operation.prepend + (value ?? '');
   if ('append' in operation) return (value ?? '') + operation.append;
+  if ('resolveURL' in operation) {
+    if (!value) return null;
+    const target = new URL(String(value), interpolate(operation.resolveURL, vars));
+    if (target.protocol !== 'https:' || target.username || target.password) throw new Error('Download links must use HTTPS without embedded credentials.');
+    return target.href;
+  }
   if ('template' in operation) return interpolate(operation.template, vars);
   return value;
 }
@@ -154,6 +160,7 @@ async function requestStep(step, vars, host) {
   if (!isSuccessful(response)) {
     throw new Error(`${vars.__sourceId ?? 'source'}: HTTP ${response.status} for ${url}`);
   }
+  if (/<title>\s*Welcome to nginx!/i.test(response.body)) throw new Error(`${vars.__sourceId}: the source server is unavailable. Please try again later.`);
   if (!hasExpectedBody(response, step)) {
     throw new Error(`${vars.__sourceId ?? 'source'}: expected pattern not found on ${url}`);
   }
@@ -224,8 +231,8 @@ function collectResults(definition, vars) {
  * @param {SourceHost} host
  * @returns {Promise<{items: Object[], hasMore: boolean}>} Items and provider continuation state.
  */
-export async function runSearch(source, query, page, host) {
-  if (source.provider) return provider(source).search(source, String(query).trim(), Math.max(1, page || 1), host);
+export async function runSearch(source, query, page, host, filters = {}) {
+  if (source.provider) return provider(source).search(source, String(query).trim(), Math.max(1, page || 1), host, filters);
   const pageNumber = Number(page) || 1;
   const vars = {
     __sourceId: source.id,
