@@ -29,4 +29,4 @@ export async function torrent(source, item) {
   if (typeof item.magnet === 'string' && item.magnet.startsWith('magnet:?')) return { url: item.magnet };
   return { url: url(item.torrentUrl, source.baseUrl) };
 }
-export async function resolve() { throw new Error('Choose an EPUB or CBZ from this release using TorBox.'); }
+export async function resolve() { throw new Error('Choose an EPUB or CBZ from this release using your connected download service.'); }

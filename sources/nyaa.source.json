@@ -1,8 +1,8 @@
 {
   "id": "nyaa",
   "name": "Nyaa",
-  "version": "1.0.0",
-  "description": "Literature torrents. Connect TorBox in Settings, then choose an EPUB or CBZ from a release.",
+  "version": "1.0.1",
+  "description": "Literature torrents. Connect Premiumize, TorBox, or Real-Debrid in Settings, then choose an EPUB or CBZ from a release.",
   "contentType": "books",
   "provider": "nyaa",
   "baseUrl": "https://nyaa.si",
