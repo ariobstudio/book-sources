@@ -45,6 +45,7 @@ export interface SourceDefinition {
     };
   };
   cover?: { steps?: Step[]; output: { url: string; headers?: Record<string, string> } };
+  torrent?: { steps?: Step[]; output: { url: string } };
   resolve?: {
     steps?: Step[];
     output: { url: string; fileName?: string; headers?: Record<string, string>; [field: string]: unknown };

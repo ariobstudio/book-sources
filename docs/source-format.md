@@ -273,3 +273,22 @@ It preserves absolute download hosts and rejects credentials and non-HTTPS URLs:
 MangaDex filters translation availability and carries the language to chapter feeds;
 Atsumaru returns English chapters. Hosts must filter metadata for adapters that
 do not support server-side language filters.
+
+## Torrent discovery
+
+Version 0.6 adds `runTorrent(source, item, host)`, which returns an advertised
+magnet or torrent URL without downloading a book. Declarative sources may define
+an optional `torrent` pipeline with the same `steps` and `output.url` shape as
+`resolve`. LibGen uses this to read links from its edition download page; absent
+links fail instead of deriving an invalid swarm hash from the book MD5.
+
+The reviewed `nyaa` provider searches only Literature. Its results have
+`format: "torrent"` and `delivery: "torrent"`, plus a magnet/torrent locator,
+release size, seeder count and language where known. English-translated is tagged
+`en`; raw and non-English categories leave language unspecified. Pagination uses
+the site's next-page link. A host must present a real torrent file selection flow;
+`runResolve` refuses to pretend a release is an EPUB/CBZ.
+
+Pillcrow connects these locators to its app-owned TorBox integration. Provider
+packs never receive the TorBox API key. This package does not embed a torrent
+engine or convert archive formats.

@@ -294,3 +294,11 @@ export async function runPages(source, item, host) {
   if (!images.length || images.length > 500) throw new Error('A chapter must contain between 1 and 500 images.');
   return images;
 }
+
+/** Resolve an advertised magnet/torrent, never infer a swarm from a book hash. */
+export async function runTorrent(source, item, host) {
+  if (source.provider && provider(source).torrent) return provider(source).torrent(source, item, host);
+  if (!source.torrent) throw new Error('This source does not advertise a torrent for this book.');
+  const result = await runResolve({ ...source, provider: undefined, resolve: source.torrent }, item, host);
+  return { url: result.url.startsWith('magnet:?') ? result.url : new URL(result.url, source.baseUrl).href };
+}

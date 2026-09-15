@@ -63,9 +63,10 @@ but it does not yet survive application termination or resume partial chapters.
 This limitation is stated before downloading. Existing native background EPUB/CBZ
 file transfers are unchanged.
 
-Nyaa was inspected: its Literature listings provide `.torrent` and magnet links,
-not direct book files. Integration requires an external torrent client or a user-configured
-download service. It is not advertised as a direct EPUB/CBZ source. WeebCentral
+Nyaa Literature is available as a torrent source. Pillcrow uses a TorBox API key
+configured in Settings to prepare a release and select individual EPUB/CBZ files.
+The source adapter exposes public magnet/.torrent locators, not fabricated book
+downloads; the host owns the cloud connection and keeps its key out of source packs. WeebCentral
 returned a Cloudflare block in this environment and was not added.
 
 Language search uses chapter translation availability on MangaDex, with the same

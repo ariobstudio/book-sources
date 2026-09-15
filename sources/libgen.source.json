@@ -1,7 +1,7 @@
 {
   "id": "libgen",
   "name": "LibGen",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "description": "Search libgen.li and download EPUB/PDF/MOBI files",
   "contentType": "books",
   "capabilities": {
@@ -290,6 +290,36 @@
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15",
         "Referer": "https://libgen.li/"
       }
+    }
+  },
+  "baseUrl": "https://libgen.li/",
+  "torrent": {
+    "steps": [
+      {
+        "step": "request",
+        "url": "https://libgen.li/ads.php?md5={item.md5}",
+        "headers": {
+          "User-Agent": "Mozilla/5.0"
+        }
+      },
+      {
+        "step": "set",
+        "name": "torrentURL",
+        "from": "response.body",
+        "ops": [
+          {
+            "regex": "href\\s*=\\s*[\"'](magnet:\\?[^\"']+|[^\"']+\\.torrent(?:\\?[^\"']*)?)[\"']",
+            "flags": "i",
+            "group": 1
+          },
+          {
+            "stripTags": true
+          }
+        ]
+      }
+    ],
+    "output": {
+      "url": "{torrentURL}"
     }
   }
 }

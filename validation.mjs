@@ -165,7 +165,7 @@ export function validateSource(source) {
     check(base.protocol === 'https:' && !base.username && !base.password, `${path}.baseUrl`, 'expected HTTPS without credentials');
     check(source.capabilities.search === true && source.capabilities.resolve === true, path, 'download adapters require search and resolve');
     if (source.capabilities.chapters !== undefined) check(source.capabilities.chapters === true && ['mangadex', 'webtoons', 'atsumaru'].includes(source.provider), path, 'adapter does not support chapters');
-    check(source.search == null && source.resolve == null && source.cover == null, path, 'adapters cannot also contain pipelines');
+    check(source.search == null && source.resolve == null && source.cover == null && source.torrent == null, path, 'adapters cannot also contain pipelines');
     if (source.configuration !== undefined) {
       check(Array.isArray(source.configuration), `${path}.configuration`, 'expected an array');
       const ids = new Set();
@@ -185,6 +185,7 @@ export function validateSource(source) {
   check(source.search != null || source.resolve != null, path, 'expected a search or resolve pipeline');
   if (source.search != null) search(source.search, `${path}.search`);
   if (source.resolve != null) resolve(source.resolve, `${path}.resolve`);
+  if (source.torrent != null) resolve(source.torrent, `${path}.torrent`);
   if (source.cover != null) resolve(source.cover, `${path}.cover`);
   return source;
 }
