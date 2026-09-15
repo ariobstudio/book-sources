@@ -1,0 +1,13 @@
+{
+  "id": "oceanofpdf",
+  "name": "OceanofPDF",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "oceanofpdf",
+  "baseUrl": "https://readrobe.com"
+}

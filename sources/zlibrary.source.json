@@ -1,0 +1,30 @@
+{
+  "id": "zlibrary",
+  "name": "Z-Library",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "zlibrary",
+  "baseUrl": "https://z-library.ec",
+  "configuration": [
+    {
+      "id": "baseUrl",
+      "label": "Source URL (optional)",
+      "type": "url"
+    },
+    {
+      "id": "email",
+      "label": "Account email",
+      "type": "text"
+    },
+    {
+      "id": "password",
+      "label": "Password",
+      "type": "password"
+    }
+  ]
+}

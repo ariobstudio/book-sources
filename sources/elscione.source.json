@@ -1,0 +1,13 @@
+{
+  "id": "elscione",
+  "name": "ElScione Server",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "elscione",
+  "baseUrl": "https://server.elscione.com"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "bookracy",
+  "name": "Bookracy",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "bookracy",
+  "baseUrl": "https://api.bookracy.com"
+}

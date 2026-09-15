@@ -12,7 +12,7 @@ or expose the engine through a JavaScript service.
 ## Install the package
 
 You need Node.js 22 or later and npm to run the CLI or work on this repository.
-There are no runtime dependencies. The package has not been published to npm;
+HTML and OPDS adapters use the DOM-free htmlparser2, css-select, and domutils packages. The package has not been published to npm;
 build an installable archive from this checkout.
 
 1. Create the archive from the repository root.
@@ -25,7 +25,7 @@ build an installable archive from this checkout.
    `/path/to/book-sources` with the absolute path to this checkout.
 
    ```bash
-   npm install /path/to/book-sources/book-sources-0.3.0.tgz
+   npm install /path/to/book-sources/book-sources-0.4.0.tgz
    ```
 
 3. Verify that the installed CLI runs.
@@ -158,3 +158,23 @@ cannot set headers can fetch bounded image bytes in the background and pass a
 local/data URI. Missing covers retain title/author placeholders.
 Search also returns page count, publisher, year, language, and file size when
 available. Provider availability can change independently of these tests.
+
+## Cinder source coverage
+
+Version 0.4.0 adds reviewed adapters for six ebook providers, OPDS, MangaDex,
+and WEBTOON. The catalog has 11 sources including the existing LibGen and
+Project Gutenberg packs. This is a selective protocol port, not a Cinder script
+runtime. Remote JSON cannot execute JavaScript. See the
+[coverage and verification record](docs/cinder-coverage.md) before enabling a provider.
+
+Chapter sources return `delivery: "chapters"` search items. Call
+`runChapters(source, item, page, host)` to select a chapter, then
+`runPages(source, chapter, host)` for its ordered image URLs and request headers.
+They do not return a ready-made CBZ from `runResolve`. Hosts download original
+images and package them locally; Pillcrow supports JPEG/PNG chapters up to 500
+images and its 128 MiB import limit. Chapter assembly currently requires the app
+to remain open; regular file downloads retain native background transfers.
+
+Optional `host.settings(source)` returns the source's configuration values.
+Pillcrow exposes these fields under Settings → Book sources → Configure and
+stores them in the device Keychain. Never embed account credentials in JSON packs.

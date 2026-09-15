@@ -1,7 +1,7 @@
 {
   "id": "book-sources",
   "name": "Book Sources",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "sources": [
     {
       "id": "libgen",
@@ -18,6 +18,147 @@
       "description": "Search Project Gutenberg ebook metadata through Gutendex.",
       "contentType": "books",
       "sourceUrl": "sources/gutenberg.source.json"
+    },
+    {
+      "id": "bookracy",
+      "name": "Bookracy",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "bookracy",
+      "baseUrl": "https://api.bookracy.com",
+      "sourceUrl": "sources/bookracy.source.json"
+    },
+    {
+      "id": "annas-archive",
+      "name": "Anna\u2019s Archive",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "annas-archive",
+      "baseUrl": "https://annas-archive.gd",
+      "configuration": [
+        {
+          "id": "supporterKey",
+          "label": "Supporter key (optional)",
+          "type": "password"
+        }
+      ],
+      "sourceUrl": "sources/annas-archive.source.json"
+    },
+    {
+      "id": "elscione",
+      "name": "ElScione Server",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "elscione",
+      "baseUrl": "https://server.elscione.com",
+      "sourceUrl": "sources/elscione.source.json"
+    },
+    {
+      "id": "oceanofpdf",
+      "name": "OceanofPDF",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "oceanofpdf",
+      "baseUrl": "https://readrobe.com",
+      "sourceUrl": "sources/oceanofpdf.source.json"
+    },
+    {
+      "id": "opds-catalog",
+      "name": "OPDS Catalog",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "opds",
+      "baseUrl": "https://example.invalid",
+      "configuration": [
+        {
+          "id": "serverUrl",
+          "label": "OPDS server URL",
+          "type": "url"
+        },
+        {
+          "id": "username",
+          "label": "Username (optional)",
+          "type": "text"
+        },
+        {
+          "id": "password",
+          "label": "Password (optional)",
+          "type": "password"
+        }
+      ],
+      "sourceUrl": "sources/opds-catalog.source.json"
+    },
+    {
+      "id": "swaytranslations",
+      "name": "Sway Translations",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "swaytranslations",
+      "baseUrl": "https://swaytranslations.wordpress.com",
+      "sourceUrl": "sources/swaytranslations.source.json"
+    },
+    {
+      "id": "zlibrary",
+      "name": "Z-Library",
+      "version": "1.0.0",
+      "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+      "contentType": "books",
+      "provider": "zlibrary",
+      "baseUrl": "https://z-library.ec",
+      "configuration": [
+        {
+          "id": "baseUrl",
+          "label": "Source URL (optional)",
+          "type": "url"
+        },
+        {
+          "id": "email",
+          "label": "Account email",
+          "type": "text"
+        },
+        {
+          "id": "password",
+          "label": "Password",
+          "type": "password"
+        }
+      ],
+      "sourceUrl": "sources/zlibrary.source.json"
+    },
+    {
+      "id": "mangadex",
+      "name": "MangaDex",
+      "version": "1.0.0",
+      "description": "Browse publicly available chapters and save original page images as CBZ.",
+      "contentType": "manga",
+      "provider": "mangadex",
+      "baseUrl": "https://api.mangadex.org",
+      "capabilities": {
+        "search": true,
+        "resolve": true,
+        "chapters": true
+      },
+      "sourceUrl": "sources/mangadex.source.json"
+    },
+    {
+      "id": "webtoons",
+      "name": "WEBTOON",
+      "version": "1.0.0",
+      "description": "Browse publicly available chapters and save original page images as CBZ.",
+      "contentType": "manga",
+      "provider": "webtoons",
+      "baseUrl": "https://www.webtoons.com",
+      "capabilities": {
+        "search": true,
+        "resolve": true,
+        "chapters": true
+      },
+      "sourceUrl": "sources/webtoons.source.json"
     }
   ]
 }

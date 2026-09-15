@@ -1,0 +1,30 @@
+{
+  "id": "opds-catalog",
+  "name": "OPDS Catalog",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "opds",
+  "baseUrl": "https://example.invalid",
+  "configuration": [
+    {
+      "id": "serverUrl",
+      "label": "OPDS server URL",
+      "type": "url"
+    },
+    {
+      "id": "username",
+      "label": "Username (optional)",
+      "type": "text"
+    },
+    {
+      "id": "password",
+      "label": "Password (optional)",
+      "type": "password"
+    }
+  ]
+}

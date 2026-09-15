@@ -1,3 +1,4 @@
+import { provider } from './providers/index.mjs';
 /**
  * Interpret declarative JSON source pipelines without executing source code.
  * This module has no Node or UI dependencies. See docs/source-format.md.
@@ -224,6 +225,7 @@ function collectResults(definition, vars) {
  * @returns {Promise<{items: Object[], hasMore: boolean}>} Items and provider continuation state.
  */
 export async function runSearch(source, query, page, host) {
+  if (source.provider) return provider(source).search(source, String(query).trim(), Math.max(1, page || 1), host);
   const pageNumber = Number(page) || 1;
   const vars = {
     __sourceId: source.id,
@@ -253,6 +255,7 @@ export async function runSearch(source, query, page, host) {
  * @returns {Promise<Object>} Output containing a nonempty url and optional fileName/headers.
  */
 export async function runResolve(source, item, host) {
+  if (source.provider) return provider(source).resolve(source, item, host);
   if (!source.resolve) throw new Error(`${source.id}: source has no resolve pipeline`);
   const vars = { __sourceId: source.id, query: '', page: 1, item };
   await runSteps(source.resolve.steps, vars, host);
@@ -265,9 +268,22 @@ export async function runResolve(source, item, host) {
 
 /** Look up the actual optional cover on an edition page, independently of search. */
 export async function runCover(source, item, host) {
+  if (source.provider) return provider(source).cover?.(source, item, host) ?? (item.coverUrl ? { url: item.coverUrl, headers: item.coverReferer ? { Referer: item.coverReferer } : {} } : null);
   if (!source.cover) return item.coverUrl ? { url: item.coverUrl, headers: item.coverReferer ? { Referer: item.coverReferer } : undefined } : null;
   const vars = { __sourceId: source.id, query: '', page: 1, item };
   await runSteps(source.cover.steps, vars, host);
   const output = Object.fromEntries(Object.entries(source.cover.output).map(([key, value]) => [key, typeof value === 'string' ? interpolate(value, vars) : value]));
   return output.url ? output : null;
+}
+
+/** Chapter catalogs use reviewed adapters; arbitrary remote scripts never run. */
+export async function runChapters(source, item, page = 1, host) {
+  if (!source.capabilities.chapters || !provider(source).chapters) throw new Error('This source does not provide chapters.');
+  return provider(source).chapters(source, item, page, host);
+}
+export async function runPages(source, item, host) {
+  if (!source.capabilities.chapters || !provider(source).pages) throw new Error('This source does not provide chapter images.');
+  const images = await provider(source).pages(source, item, host);
+  if (!images.length || images.length > 500) throw new Error('A chapter must contain between 1 and 500 images.');
+  return images;
 }

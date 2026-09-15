@@ -17,13 +17,17 @@ export type Operations = Operation | Operation[];
 export type Step =
   | { step: 'request'; url: string; method?: string; headers?: Record<string, string>; retries?: number; retryDelayMs?: number; untilRegex?: string }
   | { step: 'set'; name: string; from?: string; ops?: Operations };
+export interface SourceConfiguration { id: string; label: string; type: "text" | "password" | "url"; }
 export interface SourceDefinition {
+  provider?: string;
+  baseUrl?: string;
+  configuration?: SourceConfiguration[];
   id: string;
   name: string;
   version: string;
   contentType: string;
   description?: string;
-  capabilities: { search: boolean; resolve: boolean };
+  capabilities: { search: boolean; resolve: boolean; chapters?: boolean };
   search?: {
     steps?: Step[];
     nextPagePath?: JSONPath;
@@ -67,6 +71,7 @@ export interface TextResponse {
   body: string;
 }
 export interface SourceHost {
+  settings?(source: SourceDefinition): Promise<Record<string, string>>;
   request(url: string, options?: RequestOptions): Promise<TextResponse>;
 }
 export interface FetchResponse {
@@ -80,6 +85,9 @@ export interface RepositoryEntry {
   name: string;
   version: string;
   sourceUrl: string;
+  configuration?: SourceConfiguration[];
+  provider?: string;
+  baseUrl?: string;
   [field: string]: unknown;
 }
 export interface Repository {
@@ -87,3 +95,6 @@ export interface Repository {
   load(id: string): Promise<SourceDefinition>;
   refresh(): Promise<RepositoryEntry[]>;
 }
+
+export interface SourceChapter { id: string; title: string; number?: string; language?: string; group?: string; pages?: number; }
+export interface ChapterImage { url: string; headers?: Record<string, string>; report?: boolean; }

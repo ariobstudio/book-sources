@@ -1,0 +1,20 @@
+{
+  "id": "annas-archive",
+  "name": "Anna\u2019s Archive",
+  "version": "1.0.0",
+  "description": "Search downloadable EPUB/CBZ editions. Provider availability and account requirements apply.",
+  "contentType": "books",
+  "capabilities": {
+    "search": true,
+    "resolve": true
+  },
+  "provider": "annas-archive",
+  "baseUrl": "https://annas-archive.gd",
+  "configuration": [
+    {
+      "id": "supporterKey",
+      "label": "Supporter key (optional)",
+      "type": "password"
+    }
+  ]
+}

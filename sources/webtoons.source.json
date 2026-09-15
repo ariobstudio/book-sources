@@ -1,0 +1,14 @@
+{
+  "id": "webtoons",
+  "name": "WEBTOON",
+  "version": "1.0.0",
+  "description": "Browse publicly available chapters and save original page images as CBZ.",
+  "contentType": "manga",
+  "provider": "webtoons",
+  "baseUrl": "https://www.webtoons.com",
+  "capabilities": {
+    "search": true,
+    "resolve": true,
+    "chapters": true
+  }
+}

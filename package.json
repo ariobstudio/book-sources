@@ -1,6 +1,6 @@
 {
   "name": "book-sources",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Declarative book source pipelines with a portable JavaScript engine and Node CLI",
   "type": "module",
   "engines": {
@@ -45,7 +45,13 @@
     "cli.mjs",
     "catalog.mjs",
     "docs/",
-    "*.d.mts"
+    "*.d.mts",
+    "providers/"
   ],
-  "types": "./engine.d.mts"
+  "types": "./engine.d.mts",
+  "dependencies": {
+    "css-select": "5.2.2",
+    "domutils": "3.2.2",
+    "htmlparser2": "10.0.0"
+  }
 }

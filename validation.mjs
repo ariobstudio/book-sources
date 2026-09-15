@@ -1,3 +1,4 @@
+import { providerIDs } from './providers/index.mjs';
 /** Validate source packs at load time without importing platform APIs. */
 
 const OPERATIONS = ['regex', 'cell', 'anchors', 'json', 'stripTags', 'trim', 'lowercase', 'default', 'prepend', 'append', 'template'];
@@ -157,6 +158,26 @@ export function validateSource(source) {
   string(source.version, `${path}.version`, true);
   string(source.contentType, `${path}.contentType`, true);
   object(source.capabilities, `${path}.capabilities`);
+  if (source.provider !== undefined) {
+    check(providerIDs.includes(source.provider), `${path}.provider`, 'unknown reviewed adapter');
+    string(source.baseUrl, `${path}.baseUrl`, true);
+    const base = new URL(source.baseUrl);
+    check(base.protocol === 'https:' && !base.username && !base.password, `${path}.baseUrl`, 'expected HTTPS without credentials');
+    check(source.capabilities.search === true && source.capabilities.resolve === true, path, 'download adapters require search and resolve');
+    if (source.capabilities.chapters !== undefined) check(source.capabilities.chapters === true && ['mangadex', 'webtoons'].includes(source.provider), path, 'adapter does not support chapters');
+    check(source.search == null && source.resolve == null && source.cover == null, path, 'adapters cannot also contain pipelines');
+    if (source.configuration !== undefined) {
+      check(Array.isArray(source.configuration), `${path}.configuration`, 'expected an array');
+      const ids = new Set();
+      for (const field of source.configuration) {
+        object(field, `${path}.configuration`);
+        check(/^[a-zA-Z][a-zA-Z0-9]*$/.test(field.id) && !RESERVED_KEYS.includes(field.id) && !ids.has(field.id), path, 'invalid or duplicate configuration field');
+        ids.add(field.id); string(field.label, path, true);
+        check(['text', 'password', 'url'].includes(field.type), path, 'unsupported configuration field type');
+      }
+    }
+    return source;
+  }
   ['search', 'resolve'].forEach((name) => {
     check(typeof source.capabilities[name] === 'boolean', `${path}.capabilities.${name}`, 'expected a boolean');
     check(source.capabilities[name] === (source[name] != null), `${path}.${name}`, 'pipeline must match its capability flag');

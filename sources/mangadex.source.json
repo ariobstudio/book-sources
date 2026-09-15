@@ -1,0 +1,14 @@
+{
+  "id": "mangadex",
+  "name": "MangaDex",
+  "version": "1.0.0",
+  "description": "Browse publicly available chapters and save original page images as CBZ.",
+  "contentType": "manga",
+  "provider": "mangadex",
+  "baseUrl": "https://api.mangadex.org",
+  "capabilities": {
+    "search": true,
+    "resolve": true,
+    "chapters": true
+  }
+}
