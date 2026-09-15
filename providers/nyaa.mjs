@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Ariob Studio. Apache-2.0.
-import { all, one, attr, text, dom, request, url } from './common.mjs';
+import { all, one, attr, text, dom, request, url, optionalURL } from './common.mjs';
 
 const knownFormats = ['epub', 'cbz', 'pdf', 'cbr', 'zip', 'rar', '7z'];
 function titleFormats(title) {
@@ -55,5 +55,7 @@ export async function details(source, item, host) {
     if (knownFormats.includes(extension)) return [extension];
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'heic', 'bmp', 'tiff'].includes(extension) ? ['images'] : [];
   }))].sort();
-  return { formats, formatEvidence: 'file-list', fileCount: files.length };
+  const description = one(tree, '#torrent-description');
+  const coverUrl = description ? optionalURL(attr(one(description, 'img[src]'), 'src') || text(description).match(/!\[[^\]]*\]\((https:\/\/[^\s)]+)\)/i)?.[1], source.baseUrl) : '';
+  return { formats, formatEvidence: 'file-list', fileCount: files.length, ...(coverUrl ? { coverUrl, coverScope: 'release' } : {}) };
 }

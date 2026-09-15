@@ -105,6 +105,8 @@ export interface SourceSearchFilters { language?: string; nyaaCategory?: 'auto' 
 
 /** Filenames reported by a source, not a guarantee of file integrity or availability. */
 export interface SourceDetails {
+  coverUrl?: string;
+  coverScope?: 'release';
   formats: string[];
   formatEvidence: 'file-list';
   fileCount: number;

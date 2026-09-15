@@ -1,6 +1,6 @@
 {
   "name": "book-sources",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Declarative book source pipelines with a portable JavaScript engine and Node CLI",
   "type": "module",
   "engines": {

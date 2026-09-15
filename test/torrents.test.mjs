@@ -60,3 +60,13 @@ test('Nyaa preserves unknown and unsupported formats without treating ZIP collec
   assert.deepEqual((await details('readme.txt')).formats, []);
   await assert.rejects(runDetails(s, { id: '1' }, { request: async () => ({ status: 200, body: '<p>No file list</p>' }) }), /did not provide a file list/);
 });
+
+
+test('Nyaa exposes only HTTPS artwork from its release description, never a guessed volume cover', async () => {
+  const s = await source('nyaa');
+  const host = description => ({ request: async () => ({ status: 200, body: `<div id="torrent-description">${description}</div><div class="torrent-file-list"><li><i class="fa fa-file"></i>comic.cbz</li></div>` }) });
+  const result = await runDetails(s, { id: '1' }, host('![cover](https://art.test/cover.jpg)'));
+  assert.equal(result.coverUrl, 'https://art.test/cover.jpg'); assert.equal(result.coverScope, 'release');
+  assert.equal((await runDetails(s, { id: '1' }, host('<img src="https://art.test/image.png">'))).coverUrl, 'https://art.test/image.png');
+  assert.equal((await runDetails(s, { id: '1' }, host('![cover](http://art.test/insecure.jpg)'))).coverUrl, undefined);
+});
