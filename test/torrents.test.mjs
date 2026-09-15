@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { runSearch, runTorrent, runResolve } from '../engine.mjs';
+import { runSearch, runTorrent, runResolve, runDetails } from '../engine.mjs';
 import { validateSource } from '../validation.mjs';
 const source = async id => validateSource(JSON.parse(await readFile(new URL(`../sources/${id}.source.json`, import.meta.url))));
 const hash = '1234567890abcdef1234567890abcdef12345678';
@@ -38,4 +38,25 @@ test('Nyaa maps literature and quality filters to the site and hides only explic
   assert.ok(found.items.every(item => item.language === ''));
   const all = await runSearch(s, 'example', 4, host, { nyaaCategory: 'nonEnglish', nyaaQuality: 'noRemakes', nyaaHideNovels: false });
   assert.equal(calls[1].searchParams.get('c'), '3_2'); assert.equal(calls[1].searchParams.get('f'), '1'); assert.equal(all.items.length, 4);
+});
+
+
+test('Nyaa distinguishes title hints from formats in the actual filename tree', async () => {
+  const s = await source('nyaa');
+  const hints = await runSearch(s, 'comic', 1, { request: async () => ({ status: 200, body: `<table class="torrent-list"><tbody>${row(1,'3_1').replace('Little Nemo &amp; friends', 'Collection [EPUB + CBZ]')}${row(2,'3_1').replace('Little Nemo &amp; friends', 'The epubmaker collection')}</tbody></table>` }) });
+  assert.deepEqual(hints.items[0].formats, ['epub', 'cbz']);
+  assert.equal(hints.items[0].formatEvidence, 'title');
+  assert.deepEqual(hints.items[1].formats, []);
+  const calls = [];
+  const result = await runDetails(s, { id: '1', detailUrl: 'https://untrusted.test/' }, { request: async target => { calls.push(target); return { status: 200, body: `<div id="torrent-description">Title says EPUB</div><div class="torrent-file-list"><ul><li><a class="folder">misleading.epub</a><ul><li><i class="fa fa-file"></i>Volume 1.CBZ <span class="file-size">(12 MiB)</span></li><li><i class="fa fa-file"></i>Volume 2.cbz <span class="file-size">(12 MiB)</span></li><li><i class="fa fa-file"></i>bonus.pdf <span class="file-size">(1 MiB)</span></li><li><i class="fa fa-file"></i>cover.JPG <span class="file-size">(1 MiB)</span></li></ul></li></ul></div>` }; } });
+  assert.deepEqual(calls, ['https://nyaa.si/view/1']);
+  assert.deepEqual(result, { formats: ['cbz', 'images', 'pdf'], formatEvidence: 'file-list', fileCount: 4 });
+});
+
+test('Nyaa preserves unknown and unsupported formats without treating ZIP collections as CBZ', async () => {
+  const s = await source('nyaa');
+  const details = name => runDetails(s, { id: '1' }, { request: async () => ({ status: 200, body: `<div class="torrent-file-list"><ul><li><i class="fa fa-file"></i>${name} <span class="file-size">(1 MiB)</span></li></ul></div>` }) });
+  assert.deepEqual((await details('collection.zip')).formats, ['zip']);
+  assert.deepEqual((await details('readme.txt')).formats, []);
+  await assert.rejects(runDetails(s, { id: '1' }, { request: async () => ({ status: 200, body: '<p>No file list</p>' }) }), /did not provide a file list/);
 });

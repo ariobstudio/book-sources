@@ -159,6 +159,22 @@ local/data URI. Missing covers retain title/author placeholders.
 Search also returns page count, publisher, year, language, and file size when
 available. Provider availability can change independently of these tests.
 
+## Nyaa content formats
+
+`runDetails(source, item, host)` returns public filename metadata when an adapter
+supports it, otherwise `null`. For Nyaa it reads `/view/{id}` and returns
+`formats`, `formatEvidence: "file-list"`, and `fileCount`. It does not create a
+cloud transfer or download the torrent payload. Search results may initially
+contain `formats` with `formatEvidence: "title"`; these are hints, not confirmed
+filenames. Merge the details result over those hints when available.
+
+Keep `item.format: "torrent"` for delivery routing. EPUB/CBZ filtering should use
+`formats` for torrents. Missing file lists raise an error; an empty formats array
+with file-list evidence means filenames were present but no recognized types
+were found. ZIP/RAR collections and loose images are never labeled CBZ. Apps
+should bound and cache details lookups, cancel abandoned searches, and retain
+unknown-format results in the unfiltered view.
+
 ## Cinder source coverage
 
 Version 0.4.0 adds reviewed adapters for six ebook providers, OPDS, MangaDex,

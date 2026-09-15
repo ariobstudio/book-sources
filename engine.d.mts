@@ -9,3 +9,5 @@ export function runChapters(source: SourceDefinition, item: SourceItem, page: nu
 export function runPages(source: SourceDefinition, item: SourceItem, host: SourceHost): Promise<import('./types.mjs').ChapterImage[]>;
 
 export function runTorrent(source: SourceDefinition, item: SourceItem, host: SourceHost): Promise<Download>;
+
+export function runDetails(source: SourceDefinition, item: SourceItem, host: SourceHost): Promise<import("./types.mjs").SourceDetails | null>;

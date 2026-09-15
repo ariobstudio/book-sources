@@ -102,3 +102,10 @@ export interface SourceChapter { id: string; title: string; number?: string; lan
 export interface ChapterImage { url: string; headers?: Record<string, string>; report?: boolean; }
 
 export interface SourceSearchFilters { language?: string; nyaaCategory?: 'auto' | 'all' | 'english' | 'nonEnglish' | 'raw'; nyaaQuality?: 'all' | 'noRemakes' | 'trusted'; nyaaHideNovels?: boolean; }
+
+/** Filenames reported by a source, not a guarantee of file integrity or availability. */
+export interface SourceDetails {
+  formats: string[];
+  formatEvidence: 'file-list';
+  fileCount: number;
+}

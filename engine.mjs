@@ -302,3 +302,8 @@ export async function runTorrent(source, item, host) {
   const result = await runResolve({ ...source, provider: undefined, resolve: source.torrent }, item, host);
   return { url: result.url.startsWith('magnet:?') ? result.url : new URL(result.url, source.baseUrl).href };
 }
+
+/** Optional public metadata enrichment; never starts a download or cloud job. */
+export async function runDetails(source, item, host) {
+  return source.provider ? provider(source).details?.(source, item, host) ?? null : null;
+}
